@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/service-center/dashboard" class="active">Dashboard</a>
+            <a href="/service-center/records">Service Records</a>
+            <a href="#">Customers</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 th:text="'Good morning, ' + ${user.fullName}">Good morning</h1>
+            <p>Manage service records and track maintenance activities.</p>
+        </div>
+
+        <div th:if="${param.serviceLogged}" class="alert alert-success">
+            Service record logged successfully.
+        </div>
+
+        <div class="section-header">
+            <h2>Recent Service Records</h2>
+            <a href="/service-center/log-service" class="btn btn-primary">Log New Service</a>
+        </div>
+
+        <div class="table-wrapper">
+            <div th:if="${records.isEmpty()}" class="empty-state" style="border: none;">
+                <img th:src="@{/images/empty-records.png}" alt="No records" style="width: 150px; opacity: 0.8; margin-bottom: 20px;">
+                <h3>No service records</h3>
+                <p>Start by logging a service record for a customer's vehicle.</p>
+            </div>
+
+            <table class="data-table" th:unless="${records.isEmpty()}">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Vehicle</th>
+                        <th>Owner</th>
+                        <th>Service Type</th>
+                        <th>Cost</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="record : ${records}">
+                        <td th:text="${record.serviceDate}">-</td>
+                        <td th:text="${record.vehicle.make + ' ' + record.vehicle.model + ' (' + record.vehicle.licensePlate + ')'}">-</td>
+                        <td th:text="${record.vehicle.owner.fullName}">-</td>
+                        <td th:text="${record.serviceType}">-</td>
+                        <td th:text="'₹' + ${record.cost}">-</td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${record.status == 'COMPLETED' ? 'badge-green' : (record.status == 'PENDING' ? 'badge-gray' : 'badge-blue')}"
+                                  th:text="${record.status}">-</span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div th:if="${!records.isEmpty()}" style="margin-top: 16px; text-align: right;">
+            <a href="/service-center/records" class="btn btn-secondary">View All Records</a>
+        </div>
+    </div>
+</body>
+</html>

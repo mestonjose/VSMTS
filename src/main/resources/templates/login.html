@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/register">Create Account</a>
+        </div>
+    </nav>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <h2>Welcome back</h2>
+            <p class="subtitle">Sign in to your DriveLedger account</p>
+
+            <div th:if="${param.registered}" class="alert alert-success">
+                Account created successfully. Please sign in.
+            </div>
+            <div th:if="${param.logout}" class="alert alert-info">
+                You have been signed out.
+            </div>
+            <div th:if="${param.error}" class="alert alert-error">
+                Incorrect email or password.
+            </div>
+
+            <form th:action="@{/login}" method="post">
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" class="form-control" required>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">Sign In</button>
+            </form>
+
+            <p class="auth-footer">
+                Don't have an account? <a href="/register">Sign up</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

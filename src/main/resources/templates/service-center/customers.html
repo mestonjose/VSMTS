@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customers - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/service-center/dashboard">Dashboard</a>
+            <a href="/service-center/records">Service Records</a>
+            <a href="/service-center/customers" class="active">Customers</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="section-header" style="margin-top: 0;">
+            <div>
+                <h1 style="font-size: 1.75rem;">Customers Directory</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Manage vehicle owners and view their service history.</p>
+            </div>
+        </div>
+
+        <div class="table-wrapper" style="text-align: center; padding: 60px 20px;">
+            <img th:src="@{/images/empty-records.png}" alt="No Customers" style="width: 200px; opacity: 0.8; margin-bottom: 24px;">
+            <h3 style="font-size: 1.25rem; color: var(--text-color); margin-bottom: 8px;">No customers found</h3>
+            <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">Customer records will appear here automatically once you log service records for their vehicles.</p>
+        </div>
+    </div>
+</body>
+</html>

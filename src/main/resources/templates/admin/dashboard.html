@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/admin/dashboard" class="active">Dashboard</a>
+            <a href="#">Users</a>
+            <a href="#">Service Centers</a>
+            <a href="#">Reports</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 th:text="'Good morning, ' + ${user.fullName}">Good morning</h1>
+            <p>System administration and platform overview.</p>
+        </div>
+
+        <div class="card-grid">
+            <div class="data-card">
+                <div class="data-card-header">
+                    <div>
+                        <div class="data-card-title">Total Users</div>
+                        <div class="data-card-subtitle">Vehicle Owners</div>
+                    </div>
+                </div>
+                <div class="data-card-details" style="display: block; font-size: 2rem; font-weight: 700; color: var(--primary-blue);">
+                    <span th:text="${userCount}">0</span>
+                </div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-card-header">
+                    <div>
+                        <div class="data-card-title">Service Centers</div>
+                        <div class="data-card-subtitle">Active facilities</div>
+                    </div>
+                </div>
+                <div class="data-card-details" style="display: block; font-size: 2rem; font-weight: 700; color: var(--primary-blue);">
+                    <span th:text="${serviceCenterCount}">0</span>
+                </div>
+            </div>
+            
+            <div class="data-card">
+                <div class="data-card-header">
+                    <div>
+                        <div class="data-card-title">Registered Vehicles</div>
+                        <div class="data-card-subtitle">Platform wide</div>
+                    </div>
+                </div>
+                <div class="data-card-details" style="display: block; font-size: 2rem; font-weight: 700; color: var(--primary-blue);">
+                    <span th:text="${vehicleCount}">0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-header">
+            <h2>Recent Platform Activity</h2>
+        </div>
+
+        <div class="table-wrapper" style="text-align: center; padding: 60px 20px;">
+            <img th:src="@{/images/empty-records.png}" alt="No Activity" style="width: 200px; opacity: 0.8; margin-bottom: 24px;">
+            <h3 style="font-size: 1.25rem; color: var(--text-color); margin-bottom: 8px;">No recent activity</h3>
+            <p style="color: var(--text-secondary); max-width: 400px; margin: 0 auto;">Platform wide activity logs and system notifications will appear here.</p>
+        </div>
+    </div>
+</body>
+</html>

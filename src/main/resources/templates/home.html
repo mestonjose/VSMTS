@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DriveLedger - Vehicle Service and Maintenance Tracking System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/login">Sign In</a>
+            <a href="/register" class="btn btn-primary">Create Account</a>
+        </div>
+    </nav>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Vehicle maintenance, simplified.</h1>
+            <p>DriveLedger provides a professional platform for vehicle owners and service centers to track, manage, and verify service history with ease.</p>
+            <div class="btn-group">
+                <a href="/register" class="btn btn-primary">Get Started</a>
+                <a href="/login" class="btn btn-secondary">Sign In</a>
+            </div>
+        </div>
+        <div class="hero-image-container">
+            <img th:src="@{/images/workshop-hero.png}" alt="Modern car in a clean vehicle service workshop" class="hero-image">
+        </div>
+    </section>
+</body>
+</html>
