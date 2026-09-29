@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        
+        <div class="navbar-links" th:if="${user.role == 'VEHICLE_OWNER'}">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn active">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="navbar-links" th:if="${user.role == 'SERVICE_CENTER'}">
+            <a href="/service-center/dashboard">Dashboard</a>
+            <a href="/service-center/records">Service Records</a>
+            <a href="/service-center/customers">Customers</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn active">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+        <div class="navbar-links" th:if="${user.role == 'ADMIN'}">
+            <a href="/admin/dashboard">Dashboard</a>
+            <a href="#">Users</a>
+            <a href="#">Service Centers</a>
+            <a href="#">Reports</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn active">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="form-page-container">
+        <div class="form-page-header">
+            <h2>Account Profile</h2>
+            <p style="color: var(--text-secondary); margin-top: 4px;">Manage your account details and preferences.</p>
+        </div>
+
+        <div class="form-card" style="text-align: center; padding: 40px 20px;">
+            <div style="width: 80px; height: 80px; background-color: var(--background-color); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; border: 1px solid var(--border-color);">
+                <span style="font-size: 2rem; color: var(--primary-blue); font-weight: 600;" th:text="${#strings.substring(user.fullName, 0, 1)}">U</span>
+            </div>
+            
+            <h3 style="font-size: 1.5rem; margin-bottom: 8px; color: var(--text-color);" th:text="${user.fullName}">User Name</h3>
+            
+            <div style="display: inline-block; padding: 4px 12px; background-color: var(--background-color); border-radius: 12px; font-size: 0.85rem; font-weight: 500; color: var(--text-secondary); margin-bottom: 24px; border: 1px solid var(--border-color);">
+                <span th:if="${user.role == 'VEHICLE_OWNER'}">Vehicle Owner</span>
+                <span th:if="${user.role == 'SERVICE_CENTER'}">Service Center</span>
+                <span th:if="${user.role == 'ADMIN'}">Administrator</span>
+            </div>
+            
+            <div style="text-align: left; border-top: 1px solid var(--border-color); padding-top: 24px; margin-top: 10px;">
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Email Address</label>
+                    <div style="font-weight: 500;" th:text="${user.email}">user@example.com</div>
+                </div>
+                
+                <div>
+                    <label style="display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">Account Status</label>
+                    <div style="font-weight: 500; color: #10b981;">Active</div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 32px;">
+                <button class="btn btn-secondary" style="width: 100%;" disabled>Edit Profile (Coming Soon)</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

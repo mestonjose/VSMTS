@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Account - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/login">Sign In</a>
+        </div>
+    </nav>
+
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <h2>Create an account</h2>
+            <p class="subtitle">Join DriveLedger as a Vehicle Owner or Service Center</p>
+
+            <form th:action="@{/register}" th:object="${user}" method="post">
+                <div class="form-group">
+                    <label for="fullName">Full Name</label>
+                    <input type="text" id="fullName" th:field="*{fullName}" class="form-control" required>
+                    <span class="error-msg" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" required>
+                    <span class="error-msg" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" th:field="*{password}" class="form-control" required minlength="8">
+                    <small style="display: block; margin-top: 4px; color: var(--text-secondary); font-size: 0.8rem;">Must be at least 8 characters with 1 uppercase, 1 lowercase, 1 number, and 1 special character.</small>
+                    <span class="error-msg" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" th:field="*{confirmPassword}" class="form-control" required>
+                    <span class="error-msg" th:if="${#fields.hasErrors('confirmPassword')}" th:errors="*{confirmPassword}"></span>
+                </div>
+
+                <div class="form-group">
+                    <label for="role">Account Type</label>
+                    <select id="role" th:field="*{role}" class="form-control" required>
+                        <option value="Vehicle Owner">Vehicle Owner</option>
+                        <option value="Service Center">Service Center</option>
+                        <option value="Administrator">Administrator</option>
+                    </select>
+                    <span class="error-msg" th:if="${#fields.hasErrors('role')}" th:errors="*{role}"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 12px;">Create Account</button>
+            </form>
+
+            <p class="auth-footer">
+                Already have an account? <a href="/login">Sign in</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Vehicles - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles" class="active">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="section-header" style="margin-top: 0;">
+            <div>
+                <h1 style="font-size: 1.75rem;">My Vehicles</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Manage your registered vehicles.</p>
+            </div>
+            <a href="/owner/vehicles/add" class="btn btn-primary">Add Vehicle</a>
+        </div>
+
+        <div th:if="${vehicles.isEmpty()}" class="empty-state">
+            <img th:src="@{/images/empty-vehicles.png}" alt="No vehicles found">
+            <h3>No vehicles registered</h3>
+            <p>Get started by adding your first vehicle to track its maintenance.</p>
+            <a href="/owner/vehicles/add" class="btn btn-primary">Add Vehicle</a>
+        </div>
+
+        <div class="card-grid" th:unless="${vehicles.isEmpty()}">
+            <div class="data-card" th:each="v : ${vehicles}">
+                <div class="data-card-header">
+                    <div>
+                        <div class="data-card-title" th:text="${v.make + ' ' + v.model}">Make Model</div>
+                        <div class="data-card-subtitle" th:text="${v.year}">Year</div>
+                    </div>
+                    <span class="badge badge-gray" th:text="${v.licensePlate}">Plate</span>
+                </div>
+                <div class="data-card-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Color</span>
+                        <span class="detail-value" th:text="${v.color != null && !v.color.isEmpty() ? v.color : '-'}">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Status</span>
+                        <span class="detail-value" style="color: var(--success-green-text);">Active</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Vehicle - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles" class="active">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="form-page-container">
+        <div class="form-page-header">
+            <h2>Add Vehicle</h2>
+            <p style="color: var(--text-secondary); margin-top: 4px;">Register a new vehicle to track its maintenance.</p>
+        </div>
+
+        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+
+        <div class="form-card">
+            <form th:action="@{/owner/vehicles/add}" method="post">
+                <div class="form-group">
+                    <label for="make">Make</label>
+                    <input type="text" id="make" name="make" class="form-control" placeholder="e.g. Honda" required>
+                </div>
+                <div class="form-group">
+                    <label for="model">Model</label>
+                    <input type="text" id="model" name="model" class="form-control" placeholder="e.g. Civic" required>
+                </div>
+                <div class="form-group">
+                    <label for="year">Year</label>
+                    <input type="number" id="year" name="year" class="form-control" placeholder="e.g. 2023" min="1900" max="2030" required>
+                </div>
+                <div class="form-group">
+                    <label for="licensePlate">Registration Number</label>
+                    <input type="text" id="licensePlate" name="licensePlate" class="form-control" placeholder="e.g. KA-01-AB-1234" required>
+                </div>
+                <div class="form-group">
+                    <label for="color">Color (Optional)</label>
+                    <input type="text" id="color" name="color" class="form-control">
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <a href="/owner/vehicles" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">Save Vehicle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

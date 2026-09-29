@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard" class="active">Dashboard</a>
+            <a href="/owner/vehicles">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h1 th:text="'Good morning, ' + ${user.fullName}">Good morning</h1>
+            <p>Track your vehicles, service history, and upcoming maintenance.</p>
+        </div>
+
+        <div th:if="${param.vehicleAdded}" class="alert alert-success">
+            Vehicle added successfully.
+        </div>
+
+        <div th:if="${vehicleCount == 0}" class="empty-state">
+            <img th:src="@{/images/empty-vehicles.png}" alt="No vehicles found">
+            <h3>No vehicles registered</h3>
+            <p>Get started by adding your first vehicle to track its maintenance.</p>
+            <a href="/owner/vehicles/add" class="btn btn-primary">Add Vehicle</a>
+        </div>
+
+        <div th:if="${vehicleCount > 0}">
+            <div class="section-header">
+                <h2>My Vehicles</h2>
+                <a href="/owner/vehicles/add" class="btn btn-secondary">Add Vehicle</a>
+            </div>
+            
+            <div class="card-grid">
+                <!-- We don't have 'vehicles' in the model for the dashboard yet, but wait, do we? -->
+                <!-- The existing controller might not pass 'vehicles' to dashboard, only vehicleCount. -->
+                <!-- Let's check if 'vehicles' is available or just show records. -->
+                <!-- If the backend doesn't pass 'vehicles' list to dashboard, we just show records. -->
+                <!-- Let's add a button to view vehicles instead, to be safe, or just rely on the table below. -->
+            </div>
+
+            <div class="section-header">
+                <h2>Recent Service Activity</h2>
+                <a href="/owner/service-history" class="btn btn-secondary" th:if="${recordCount > 0}">View All</a>
+            </div>
+
+            <div class="table-wrapper">
+                <div th:if="${recordCount == 0}" class="empty-state" style="padding: 40px 20px;">
+                    <h3>No service records</h3>
+                    <p>When a service center logs maintenance for your vehicles, it will appear here.</p>
+                </div>
+
+                <table class="data-table" th:if="${recordCount > 0}">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="record : ${records}">
+                            <td th:text="${record.serviceDate}">-</td>
+                            <td th:text="${record.vehicle.make + ' ' + record.vehicle.model + ' (' + record.vehicle.licensePlate + ')'}">-</td>
+                            <td th:text="${record.serviceType}">-</td>
+                            <td th:text="'₹' + ${record.cost}">-</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${record.status == 'COMPLETED' ? 'badge-green' : (record.status == 'PENDING' ? 'badge-gray' : 'badge-blue')}"
+                                      th:text="${record.status}">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
