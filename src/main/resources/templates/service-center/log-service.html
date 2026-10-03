@@ -1,92 +1,178 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Service - DriveLedger</title>
-    <link rel="stylesheet" th:href="@{/css/style.css}">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+                    }
+                }
+            }
+        }
+    </script>
 </head>
-<body>
-    <nav class="navbar">
-        <a href="/" class="navbar-brand">DriveLedger</a>
-        <div class="navbar-links">
-            <a href="/service-center/dashboard">Dashboard</a>
-            <a href="/service-center/records" class="active">Service Records</a>
-            <a href="#">Customers</a>
-            
-            <div class="profile-menu">
-                <button class="profile-menu-btn">Profile ▼</button>
-                <div class="profile-dropdown">
-                    <a href="/profile">Account Settings</a>
-                    <form th:action="@{/logout}" method="post">
-                        <button type="submit">Sign Out</button>
-                    </form>
+<body class="bg-slate-50 min-h-screen">
+
+    <!-- Modern Navbar -->
+    <nav x-data="{ mobileMenuOpen: false, profileMenuOpen: false }" class="bg-white shadow-sm sticky top-0 z-50 border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                
+                <div class="flex items-center gap-8">
+                    <!-- Logo -->
+                    <div class="flex-shrink-0 flex items-center gap-2">
+                        <div class="bg-brand-500 text-white p-2 rounded-lg shadow-sm">
+                            <i class="fa-solid fa-wrench"></i>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight text-slate-900">DriveLedger</span>
+                    </div>
+
+                    <!-- Desktop Links -->
+                    <div class="hidden md:flex items-center space-x-6">
+                        <a th:href="@{/service-center/dashboard}" class="text-slate-500 hover:text-brand-600 font-medium transition-colors">Dashboard</a>
+                        <a th:href="@{/service-center/records}" class="text-brand-600 font-bold border-b-2 border-brand-500 pb-1 pt-1">Service Records</a>
+                        <a href="#" class="text-slate-500 hover:text-brand-600 font-medium transition-colors">Customers</a>
+                    </div>
+                </div>
+
+                <!-- Profile Dropdown -->
+                <div class="hidden md:block relative">
+                    <button @click="profileMenuOpen = !profileMenuOpen" @click.away="profileMenuOpen = false" class="flex items-center gap-2 focus:outline-none">
+                        <div class="w-9 h-9 rounded-full bg-slate-200 border-2 border-brand-500 flex items-center justify-center text-slate-600 font-bold shadow-sm">
+                            <i class="fa-solid fa-user-gear"></i>
+                        </div>
+                        <i class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform" :class="profileMenuOpen ? 'rotate-180' : ''"></i>
+                    </button>
+                    
+                    <div x-show="profileMenuOpen" x-transition x-cloak class="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-slate-100 py-1 overflow-hidden z-50">
+                        <a th:href="@{/profile}" class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 hover:text-brand-600"><i class="fa-solid fa-gear mr-2 w-4"></i> Settings</a>
+                        <form th:action="@{/logout}" method="post" class="w-full">
+                            <button type="submit" class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50"><i class="fa-solid fa-arrow-right-from-bracket mr-2 w-4"></i> Sign Out</button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </nav>
 
-    <div class="form-page-container">
-        <div class="form-page-header">
-            <h2>Log Service Record</h2>
-            <p style="color: var(--text-secondary); margin-top: 4px;">Record maintenance performed on a customer's vehicle.</p>
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        
+        <!-- Header -->
+        <div class="mb-8 border-b border-slate-200 pb-5">
+            <h2 class="text-3xl font-bold text-slate-900 flex items-center gap-3">
+                <i class="fa-solid fa-clipboard-check text-brand-500"></i> Log Service Record
+            </h2>
+            <p class="text-slate-500 mt-2 text-lg">Record maintenance and repairs performed on a customer's vehicle.</p>
         </div>
 
-        <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+        <div th:if="${error}" class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-r-lg shadow-sm">
+            <div class="flex">
+                <div class="flex-shrink-0"><i class="fa-solid fa-circle-exclamation text-red-500"></i></div>
+                <div class="ml-3"><p class="text-sm text-red-700" th:text="${error}"></p></div>
+            </div>
+        </div>
 
-        <div class="form-card">
-            <form th:action="@{/service-center/log-service}" method="post">
-                <div class="form-group">
-                    <label for="vehicleId">Customer Vehicle</label>
-                    <select id="vehicleId" name="vehicleId" class="form-control" required>
-                        <option value="" disabled selected>Select a vehicle...</option>
-                        <option th:each="v : ${vehicles}" th:value="${v.id}"
-                                th:text="${v.make + ' ' + v.model + ' (' + v.licensePlate + ') - ' + v.owner.fullName}">Vehicle</option>
-                    </select>
-                </div>
+        <!-- Form Card -->
+        <div x-data="{ loading: false }" class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden">
+            <form th:action="@{/service-center/log-service}" method="post" class="p-8 space-y-6" @submit="loading = true">
                 
-                <div class="form-group">
-                    <label for="serviceType">Service Type</label>
-                    <select id="serviceType" name="serviceType" class="form-control" required>
-                        <option value="" disabled selected>Select type...</option>
-                        <option value="Oil Change">Oil Change</option>
-                        <option value="Tire Rotation">Tire Rotation</option>
-                        <option value="Brake Inspection">Brake Inspection</option>
-                        <option value="Engine Tune-Up">Engine Tune-Up</option>
-                        <option value="Battery Replacement">Battery Replacement</option>
-                        <option value="AC Service">AC Service</option>
-                        <option value="General Maintenance">General Maintenance</option>
-                        <option value="Other">Other</option>
-                    </select>
+                <!-- Vehicle Selection -->
+                <div>
+                    <label for="vehicleId" class="block text-sm font-semibold text-slate-700 mb-1">Customer Vehicle</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-car text-slate-400"></i></div>
+                        <select id="vehicleId" name="vehicleId" class="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50 appearance-none" required>
+                            <option value="" disabled selected>Select a registered vehicle...</option>
+                            <option th:each="v : ${vehicles}" th:value="${v.id}" th:text="${v.make + ' ' + v.model + ' (' + v.licensePlate + ') - Owner: ' + v.owner.fullName}"></option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i></div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="description">Description (Work & Parts Replaced)</label>
-                    <textarea id="description" name="description" class="form-control" rows="4" style="resize: vertical; min-height: 80px;" required></textarea>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Service Type -->
+                    <div>
+                        <label for="serviceType" class="block text-sm font-semibold text-slate-700 mb-1">Service Type</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-wrench text-slate-400"></i></div>
+                            <select id="serviceType" name="serviceType" class="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50 appearance-none" required>
+                                <option value="" disabled selected>Select service category...</option>
+                                <option value="Oil Change">Oil Change</option>
+                                <option value="Tire Rotation">Tire Rotation</option>
+                                <option value="Brake Inspection">Brake Inspection</option>
+                                <option value="Engine Tune-Up">Engine Tune-Up</option>
+                                <option value="Battery Replacement">Battery Replacement</option>
+                                <option value="AC Service">AC Service</option>
+                                <option value="General Maintenance">General Maintenance</option>
+                                <option value="Other">Other</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i></div>
+                        </div>
+                    </div>
+
+                    <!-- Date -->
+                    <div>
+                        <label for="serviceDate" class="block text-sm font-semibold text-slate-700 mb-1">Service Date</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-calendar-day text-slate-400"></i></div>
+                            <input type="date" id="serviceDate" name="serviceDate" class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50" required>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="serviceDate">Service Date</label>
-                    <input type="date" id="serviceDate" name="serviceDate" class="form-control" required>
+
+                <!-- Description -->
+                <div>
+                    <label for="description" class="block text-sm font-semibold text-slate-700 mb-1">Detailed Description & Parts Replaced</label>
+                    <textarea id="description" name="description" rows="4" class="block w-full p-4 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50 placeholder-slate-400" placeholder="E.g., Replaced 5 quarts of synthetic oil and installed a new OEM oil filter. Inspected brake pads." required></textarea>
                 </div>
-                
-                <div class="form-group">
-                    <label for="cost">Total Cost (₹)</label>
-                    <input type="number" id="cost" name="cost" class="form-control" step="0.01" min="0" required>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pb-2">
+                    <!-- Cost -->
+                    <div>
+                        <label for="cost" class="block text-sm font-semibold text-slate-700 mb-1">Total Cost (₹)</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-indian-rupee-sign text-slate-400"></i></div>
+                            <input type="number" id="cost" name="cost" step="0.01" min="0" class="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50" placeholder="0.00" required>
+                        </div>
+                    </div>
+
+                    <!-- Status -->
+                    <div>
+                        <label for="status" class="block text-sm font-semibold text-slate-700 mb-1">Current Status</label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none"><i class="fa-solid fa-bars-progress text-slate-400"></i></div>
+                            <select id="status" name="status" class="block w-full pl-10 pr-10 py-3 border border-slate-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm shadow-sm bg-slate-50 appearance-none font-medium" required>
+                                <option value="COMPLETED" class="text-brand-600 font-bold">✓ Completed</option>
+                                <option value="IN_PROGRESS" class="text-amber-600 font-bold">⌛ In Progress</option>
+                                <option value="PENDING" class="text-slate-600 font-bold">⏱ Pending</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none"><i class="fa-solid fa-chevron-down text-slate-400 text-xs"></i></div>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="form-group">
-                    <label for="status">Status</label>
-                    <select id="status" name="status" class="form-control" required>
-                        <option value="PENDING">Pending</option>
-                        <option value="IN_PROGRESS">In Progress</option>
-                        <option value="COMPLETED">Completed</option>
-                    </select>
-                </div>
-                
-                <div style="display: flex; gap: 12px; margin-top: 24px;">
-                    <a href="/service-center/dashboard" class="btn btn-secondary">Cancel</a>
-                    <button type="submit" class="btn btn-primary">Save Record</button>
+
+                <!-- Submit Buttons -->
+                <div class="flex items-center justify-end gap-4 pt-6 border-t border-slate-100">
+                    <a th:href="@{/service-center/dashboard}" class="px-6 py-3 border border-slate-300 shadow-sm text-sm font-semibold rounded-xl text-slate-700 bg-white hover:bg-slate-50 transition-colors">Cancel</a>
+                    <button type="submit" :disabled="loading" class="flex items-center px-8 py-3 border border-transparent shadow-md text-sm font-bold rounded-xl text-white bg-brand-600 hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all disabled:opacity-70">
+                        <i class="fa-solid fa-circle-notch fa-spin mr-2" x-show="loading" x-cloak></i>
+                        <span x-text="loading ? 'Saving...' : 'Save Service Record'"></span>
+                    </button>
                 </div>
             </form>
         </div>
