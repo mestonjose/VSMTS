@@ -3,118 +3,127 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sign in - DriveLedger</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <title>Login - DriveLedger</title>
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Alpine.js -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
     <script>
         tailwind.config = {
             theme: {
                 extend: {
-                    fontFamily: { sans: ['Inter', 'sans-serif'] },
-                    colors: { brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca' } }
+                    colors: {
+                        brand: { 50: '#f0fdf4', 500: '#22c55e', 600: '#16a34a', 700: '#15803d' }
+                    }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-slate-50 min-h-screen flex font-sans selection:bg-brand-100 selection:text-brand-900">
+<body class="bg-slate-50 min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 relative">
 
-    <div class="flex-1 flex flex-col justify-center py-12 px-4 sm:px-6 lg:flex-none lg:px-20 xl:px-24 bg-white shadow-xl z-10 relative">
-        <div class="mx-auto w-full max-w-sm lg:w-96">
-            <div>
-                <a th:href="@{/}" class="flex items-center gap-2 mb-8 group">
-                    <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center shadow-md group-hover:bg-brand-700 transition-colors">
-                        <i class="fa-solid fa-layer-group text-white text-xs"></i>
+    <!-- Decorative Background Blobs -->
+    <div class="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
+        <div class="absolute -top-24 -left-24 w-96 h-96 rounded-full bg-brand-100 opacity-50 blur-3xl"></div>
+        <div class="absolute top-1/2 right-0 w-80 h-80 rounded-full bg-blue-100 opacity-50 blur-3xl translate-x-1/2"></div>
+    </div>
+
+    <!-- Login Card -->
+    <div x-data="{ loading: false }" class="max-w-md w-full bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden transform transition-all">
+        
+        <!-- Header -->
+        <div class="bg-slate-900 px-8 py-10 text-center">
+            <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-white/10 mb-4 backdrop-blur-sm">
+                <i class="fa-solid fa-user-shield text-2xl text-brand-500"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-white tracking-tight">Welcome Back</h2>
+            <p class="text-slate-400 mt-2 text-sm">Sign in to access your DriveLedger dashboard</p>
+        </div>
+
+        <div class="px-8 py-10">
+            <!-- Spring Security Error Alert -->
+            <div th:if="${param.error}" x-data="{ show: true }" x-show="show" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+                <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-medium text-red-800">Authentication Failed</h3>
+                    <p class="text-sm text-red-600 mt-1">Invalid username or password.</p>
+                </div>
+                <button @click="show = false" class="text-red-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Spring Security Logout Alert -->
+            <div th:if="${param.logout}" x-data="{ show: true }" x-show="show" class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+                <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
+                <div class="flex-1">
+                    <p class="text-sm text-green-700">You have been successfully logged out.</p>
+                </div>
+                <button @click="show = false" class="text-green-400 hover:text-green-500"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+
+            <!-- Login Form -->
+            <form th:action="@{/login}" method="post" class="space-y-6" @submit="loading = true">
+                
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email Address</label>
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-envelope text-slate-400"></i>
+                        </div>
+                        <input id="email" name="email" type="email" required autofocus
+                            class="block w-full pl-10 pr-3 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm transition-shadow shadow-sm" 
+                            placeholder="Enter your email address">
                     </div>
-                    <span class="font-bold text-xl tracking-tight text-slate-900">DriveLedger</span>
-                </a>
-                <h2 class="mt-6 text-3xl font-extrabold text-slate-900 tracking-tight">Sign in to your account</h2>
-                <p class="mt-2 text-sm text-slate-600">
-                    Or <a th:href="@{/register}" class="font-medium text-brand-600 hover:text-brand-500 transition-colors">create a new identity</a>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <div class="relative" x-data="{ showPassword: false }">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-lock text-slate-400"></i>
+                        </div>
+                        <input id="password" name="password" :type="showPassword ? 'text' : 'password'" required
+                            class="block w-full pl-10 pr-10 py-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 text-sm transition-shadow shadow-sm" 
+                            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢">
+                        <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 focus:outline-none">
+                            <i class="fa-regular" :class="showPassword ? 'fa-eye-slash' : 'fa-eye'"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-slate-300 rounded cursor-pointer">
+                        <label for="remember-me" class="ml-2 block text-sm text-slate-600 cursor-pointer">Remember me</label>
+                    </div>
+                    <div class="text-sm">
+                        <a href="#" class="font-medium text-brand-600 hover:text-brand-500">Forgot password?</a>
+                    </div>
+                </div>
+
+                <button type="submit" :disabled="loading" 
+                    class="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
+                    <i class="fa-solid fa-circle-notch fa-spin mr-2" x-show="loading" x-cloak></i>
+                    <span x-text="loading ? 'Authenticating...' : 'Sign In'"></span>
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-sm text-slate-600">
+                    Don't have an account? 
+                    <a th:href="@{/register}" class="font-semibold text-brand-600 hover:text-brand-500 transition-colors">Register here</a>
                 </p>
             </div>
-
-            <div class="mt-8">
-                <!-- Alerts -->
-                <div th:if="" x-data="{ show: true }" x-show="show" class="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
-                    <i class="fa-solid fa-circle-exclamation text-red-500 mt-0.5"></i>
-                    <div class="flex-1">
-                        <h3 class="text-sm font-medium text-red-800">Authentication Failed</h3>
-                        <p class="text-sm text-red-600 mt-1">Invalid credentials provided.</p>
-                    </div>
-                    <button @click="show = false" class="text-red-400 hover:text-red-500"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-                <div th:if="" x-data="{ show: true }" x-show="show" class="mb-6 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
-                    <i class="fa-solid fa-circle-check text-green-500 mt-0.5"></i>
-                    <div class="flex-1">
-                        <p class="text-sm text-green-700">Successfully signed out of the system.</p>
-                    </div>
-                    <button @click="show = false" class="text-green-400 hover:text-green-500"><i class="fa-solid fa-xmark"></i></button>
-                </div>
-
-                <div class="mt-6">
-                    <form th:action="@{/login}" method="post" class="space-y-5" x-data="{ loading: false }" @submit="loading = true">
-                        <div>
-                            <label for="email" class="block text-sm font-medium text-slate-700">Email address</label>
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <input id="email" name="email" type="email" required autofocus
-                                    class="appearance-none block w-full px-3 py-2.5 border border-slate-300 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm transition-shadow"
-                                    placeholder="admin@driveledger.com">
-                            </div>
-                        </div>
-
-                        <div>
-                            <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
-                            <div class="mt-1 relative rounded-md shadow-sm" x-data="{ show: false }">
-                                <input id="password" name="password" :type="show ? 'text' : 'password'" required
-                                    class="appearance-none block w-full px-3 py-2.5 border border-slate-300 rounded-lg placeholder-slate-400 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm transition-shadow pr-10"
-                                    placeholder="••••••••••••">
-                                <button type="button" @click="show = !show" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600">
-                                    <i class="fa-regular" :class="show ? 'fa-eye-slash' : 'fa-eye'"></i>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div class="flex items-center justify-between">
-                            <div class="flex items-center">
-                                <input id="remember-me" name="remember-me" type="checkbox" class="h-4 w-4 text-brand-600 focus:ring-brand-500 border-slate-300 rounded cursor-pointer">
-                                <label for="remember-me" class="ml-2 block text-sm text-slate-900 cursor-pointer">Remember me</label>
-                            </div>
-                            <div class="text-sm">
-                                <a href="#" class="font-medium text-brand-600 hover:text-brand-500">Forgot password?</a>
-                            </div>
-                        </div>
-
-                        <div>
-                            <button type="submit" :disabled="loading"
-                                class="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-brand-600 hover:bg-brand-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-brand-500 transition-all disabled:opacity-70 disabled:cursor-not-allowed">
-                                <i class="fa-solid fa-circle-notch fa-spin mr-2 mt-0.5" x-show="loading" x-cloak></i>
-                                <span x-text="loading ? 'Authenticating...' : 'Sign in'"></span>
-                            </button>
-                        </div>
-                    </form>
-                </div>
+            
+            <div class="mt-4 text-center">
+                <a th:href="@{/}" class="text-sm text-slate-500 hover:text-slate-700"><i class="fa-solid fa-arrow-left mr-1"></i> Back to Home</a>
             </div>
         </div>
     </div>
-    
-    <div class="hidden lg:block relative w-0 flex-1 bg-slate-900">
-        <div class="absolute inset-0 bg-gradient-to-br from-brand-900 to-slate-900 mix-blend-multiply opacity-90 z-10"></div>
-        <img class="absolute inset-0 h-full w-full object-cover grayscale opacity-50" src="https://images.unsplash.com/photo-1502877338535-346ce0f1ea60?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80" alt="">
-        <div class="absolute inset-0 flex items-center justify-center z-20">
-            <div class="max-w-lg text-center px-8">
-                <div class="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center mx-auto mb-6">
-                    <i class="fa-solid fa-shield-halved text-2xl text-white"></i>
-                </div>
-                <h3 class="text-2xl font-bold text-white mb-2 tracking-tight">Enterprise Security Standard</h3>
-                <p class="text-slate-300 font-light leading-relaxed">DriveLedger utilizes Spring Security and Role-Based Access Control to guarantee that your business logic and customer data remain perfectly isolated.</p>
-            </div>
-        </div>
-    </div>
-
 </body>
 </html>
