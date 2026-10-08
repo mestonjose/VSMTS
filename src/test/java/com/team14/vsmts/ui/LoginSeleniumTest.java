@@ -36,11 +36,14 @@ public class LoginSeleniumTest {
     @Test
     @DisplayName("Selenium UI: Should successfully register and then login")
     public void testSuccessfulLogin() throws InterruptedException {
+        // Create ONE unique email for this entire test
+        String uniqueEmail = "mestonjose.demo" + System.currentTimeMillis() + "@example.com";
+
         // 1. REGISTER FIRST
         driver.get("http://localhost:" + port + "/register");
         
         driver.findElement(By.id("fullName")).sendKeys("Meston Jose");
-        driver.findElement(By.id("email")).sendKeys("mestonjose.demo" + System.currentTimeMillis() + "@example.com");
+        driver.findElement(By.id("email")).sendKeys(uniqueEmail);
         driver.findElement(By.id("password")).sendKeys("M3ston@3001");
         driver.findElement(By.id("confirmPassword")).sendKeys("M3ston@3001");
         new Select(driver.findElement(By.id("role"))).selectByValue("Vehicle Owner");
@@ -56,7 +59,8 @@ public class LoginSeleniumTest {
         WebElement passwordField = driver.findElement(By.id("password"));
         WebElement submitButton = driver.findElement(By.cssSelector("button[type='submit']"));
 
-        emailField.sendKeys("mestonjose.demo" + System.currentTimeMillis() + "@example.com");
+        // Use the exact same email we just registered!
+        emailField.sendKeys(uniqueEmail);
         passwordField.sendKeys("M3ston@3001");
         
         Thread.sleep(1500); // Wait so you can see the login form filled
