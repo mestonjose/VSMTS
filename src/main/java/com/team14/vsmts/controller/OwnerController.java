@@ -1,5 +1,6 @@
 package com.team14.vsmts.controller;
 
+import com.team14.vsmts.dto.CostReportDto;
 import com.team14.vsmts.model.ServiceRecord;
 import com.team14.vsmts.model.User;
 import com.team14.vsmts.model.Vehicle;
@@ -77,5 +78,20 @@ public class OwnerController {
         model.addAttribute("records", records);
         model.addAttribute("vehicles", vehicles);
         return "owner/service-history";
+    }
+
+    // VSMTS-14: Cost Dashboard & Reports
+    @GetMapping("/reports")
+    public String costReports(Authentication auth, Model model) {
+        User user = userService.findByEmail(auth.getName());
+        List<Vehicle> vehicles = vehicleService.getVehiclesByOwner(user);
+        CostReportDto report = serviceRecordService.calculateCostReport(vehicles);
+        List<ServiceRecord> records = serviceRecordService.getRecordsByVehiclesSortedByDate(vehicles);
+
+        model.addAttribute("user", user);
+        model.addAttribute("vehicles", vehicles);
+        model.addAttribute("report", report);
+        model.addAttribute("records", records);
+        return "owner/reports";
     }
 }

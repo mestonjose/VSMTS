@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cost Dashboard & Reports - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Chart.js for cost visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            <a href="/owner/reports" class="active">Cost Reports</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="section-header" style="margin-top: 0;">
+            <div>
+                <h1 style="font-size: 1.75rem;">Cost Dashboard & Reports</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Comprehensive financial overview of maintenance and repair expenses across your fleet.</p>
+            </div>
+            <a href="/owner/service-history" class="btn btn-secondary">Full Service Log</a>
+        </div>
+
+        <div th:if="${report.totalServices == 0}" class="empty-state">
+            <img th:src="@{/images/empty-records.png}" alt="No cost data" style="width: 140px; opacity: 0.8; margin-bottom: 16px;">
+            <h3>No expense data available</h3>
+            <p>Once services are logged for your vehicles, your cost metrics and analytics charts will appear here automatically.</p>
+            <a href="/owner/dashboard" class="btn btn-primary" style="margin-top: 12px;">Go to Dashboard</a>
+        </div>
+
+        <div th:if="${report.totalServices > 0}">
+            <!-- Summary KPI Cards -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-bottom: 28px;">
+                <div class="card" style="padding: 20px; border-left: 4px solid #22c55e;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">TOTAL EXPENDITURE</div>
+                    <div style="font-size: 1.85rem; font-weight: 700; color: #1e293b; margin-top: 4px;" th:text="'₹' + ${#numbers.formatDecimal(report.totalCost, 1, 2)}">₹0.00</div>
+                    <div style="font-size: 0.8rem; color: #22c55e; margin-top: 4px;">Across all registered vehicles</div>
+                </div>
+
+                <div class="card" style="padding: 20px; border-left: 4px solid #3b82f6;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">TOTAL SERVICES</div>
+                    <div style="font-size: 1.85rem; font-weight: 700; color: #1e293b; margin-top: 4px;" th:text="${report.totalServices}">0</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Completed service records</div>
+                </div>
+
+                <div class="card" style="padding: 20px; border-left: 4px solid #f59e0b;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">AVERAGE COST / VISIT</div>
+                    <div style="font-size: 1.85rem; font-weight: 700; color: #1e293b; margin-top: 4px;" th:text="'₹' + ${#numbers.formatDecimal(report.averageCost, 1, 2)}">₹0.00</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Per maintenance event</div>
+                </div>
+
+                <div class="card" style="padding: 20px; border-left: 4px solid #ef4444;">
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">HIGHEST SINGLE SERVICE</div>
+                    <div style="font-size: 1.85rem; font-weight: 700; color: #1e293b; margin-top: 4px;" th:text="'₹' + ${#numbers.formatDecimal(report.highestCost, 1, 2)}">₹0.00</div>
+                    <div style="font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px;">Peak individual invoice</div>
+                </div>
+            </div>
+
+            <!-- Visual Charts Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                <!-- Cost by Service Type Doughnut Chart -->
+                <div class="card" style="padding: 20px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 16px;">Spending by Service Category</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="typeChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Cost by Vehicle Bar Chart -->
+                <div class="card" style="padding: 20px;">
+                    <h3 style="font-size: 1.1rem; font-weight: 600; color: #1e293b; margin-bottom: 16px;">Expenditure by Vehicle</h3>
+                    <div style="height: 260px; position: relative;">
+                        <canvas id="vehicleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vehicle Breakdown Summary Table -->
+            <div class="section-header" style="margin-top: 16px;">
+                <h2>Vehicle Expense Breakdown</h2>
+            </div>
+            <div class="table-wrapper" style="margin-bottom: 36px;">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>License Plate</th>
+                            <th>Total Services</th>
+                            <th>Total Amount Spent</th>
+                            <th>Avg Cost / Service</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="v : ${report.vehicleSummaries}">
+                            <td style="font-weight: 600;" th:text="${v.vehicleName}">Honda Civic</td>
+                            <td th:text="${v.licensePlate}">KA-01-AB-1234</td>
+                            <td th:text="${v.serviceCount}">2</td>
+                            <td style="font-weight: 600; color: #047857;" th:text="'₹' + ${#numbers.formatDecimal(v.totalSpent, 1, 2)}">₹4,000</td>
+                            <td th:text="'₹' + ${#numbers.formatDecimal(v.averageSpent, 1, 2)}">₹2,000</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Recent Expenses Table -->
+            <div class="section-header" style="margin-top: 16px;">
+                <h2>Recent Expense Log</h2>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service Type</th>
+                            <th>Cost</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="r : ${records}">
+                            <td th:text="${r.serviceDate}">2026-10-01</td>
+                            <td th:text="${r.vehicle.make + ' ' + r.vehicle.model + ' (' + r.vehicle.licensePlate + ')'}">Toyota</td>
+                            <td th:text="${r.serviceType}">Brake Inspection</td>
+                            <td style="font-weight: 600;" th:text="'₹' + ${r.cost}">₹500</td>
+                            <td>
+                                <span class="badge"
+                                      th:classappend="${r.status == 'COMPLETED' ? 'badge-green' : (r.status == 'PENDING' ? 'badge-gray' : 'badge-blue')}"
+                                      th:text="${r.status}">COMPLETED</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart.js Initialization Script -->
+    <script th:inline="javascript" th:if="${report.totalServices > 0}">
+        /*<![CDATA[*/
+        const typeData = /*[[${report.costByServiceType}]]*/ {};
+        const vehicleData = /*[[${report.costByVehicle}]]*/ {};
+
+        // 1. Service Type Doughnut Chart
+        const typeLabels = Object.keys(typeData);
+        const typeValues = Object.values(typeData);
+        const palette = ['#22c55e', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6', '#14b8a6', '#f97316'];
+
+        const ctxType = document.getElementById('typeChart').getContext('2d');
+        new Chart(ctxType, {
+            type: 'doughnut',
+            data: {
+                labels: typeLabels,
+                datasets: [{
+                    data: typeValues,
+                    backgroundColor: palette.slice(0, typeLabels.length),
+                    borderWidth: 2,
+                    borderColor: '#ffffff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { boxWidth: 14, font: { size: 12 } }
+                    }
+                }
+            }
+        });
+
+        // 2. Vehicle Bar Chart
+        const vLabels = Object.keys(vehicleData);
+        const vValues = Object.values(vehicleData);
+
+        const ctxVehicle = document.getElementById('vehicleChart').getContext('2d');
+        new Chart(ctxVehicle, {
+            type: 'bar',
+            data: {
+                labels: vLabels,
+                datasets: [{
+                    label: 'Total Spent (₹)',
+                    data: vValues,
+                    backgroundColor: '#3b82f6',
+                    borderRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) { return '₹' + value; }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false }
+                }
+            }
+        });
+        /*]]>*/
+    </script>
+</body>
+</html>
