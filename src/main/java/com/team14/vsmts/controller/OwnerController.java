@@ -65,8 +65,46 @@ public class OwnerController {
     @GetMapping("/vehicles")
     public String listVehicles(Authentication auth, Model model) {
         User user = userService.findByEmail(auth.getName());
-        model.addAttribute("vehicles", vehicleService.getVehiclesByOwner(user));
+        model.addAttribute("vehicles", vehicleService.getActiveVehiclesByOwner(user));
         return "owner/vehicles";
+    }
+
+    // VSMTS-6: Edit Vehicle
+    @GetMapping("/vehicles/{id}/edit")
+    public String showEditVehicleForm(@PathVariable Long id, Authentication auth, Model model) {
+        User user = userService.findByEmail(auth.getName());
+        Vehicle vehicle = vehicleService.getVehicleById(id);
+        if (vehicle == null || !vehicle.getOwner().getId().equals(user.getId())) {
+            return "redirect:/owner/vehicles";
+        }
+        model.addAttribute("vehicle", vehicle);
+        return "owner/edit-vehicle";
+    }
+
+    @PostMapping("/vehicles/{id}/edit")
+    public String updateVehicle(@PathVariable Long id, @ModelAttribute Vehicle updated, Authentication auth) {
+        User user = userService.findByEmail(auth.getName());
+        Vehicle vehicle = vehicleService.getVehicleById(id);
+        if (vehicle == null || !vehicle.getOwner().getId().equals(user.getId())) {
+            return "redirect:/owner/vehicles";
+        }
+        vehicle.setMake(updated.getMake());
+        vehicle.setModel(updated.getModel());
+        vehicle.setYear(updated.getYear());
+        vehicle.setColor(updated.getColor());
+        vehicleService.save(vehicle);
+        return "redirect:/owner/vehicles?updated";
+    }
+
+    // VSMTS-6: Archive Vehicle
+    @PostMapping("/vehicles/{id}/archive")
+    public String archiveVehicle(@PathVariable Long id, Authentication auth) {
+        User user = userService.findByEmail(auth.getName());
+        Vehicle vehicle = vehicleService.getVehicleById(id);
+        if (vehicle != null && vehicle.getOwner().getId().equals(user.getId())) {
+            vehicleService.archiveVehicle(id);
+        }
+        return "redirect:/owner/vehicles?archived";
     }
 
     @GetMapping("/service-history")

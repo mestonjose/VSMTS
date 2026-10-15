@@ -33,4 +33,23 @@ public class VehicleService {
     public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
+
+    // VSMTS-6: Edit and Archive vehicle
+    public Vehicle save(Vehicle vehicle) {
+        return vehicleRepository.save(vehicle);
+    }
+
+    public void archiveVehicle(Long id) {
+        Vehicle v = vehicleRepository.findById(id).orElse(null);
+        if (v != null) {
+            v.setArchived(true);
+            vehicleRepository.save(v);
+        }
+    }
+
+    public List<Vehicle> getActiveVehiclesByOwner(User owner) {
+        return vehicleRepository.findByOwner(owner).stream()
+                .filter(v -> !v.isArchived())
+                .collect(java.util.stream.Collectors.toList());
+    }
 }

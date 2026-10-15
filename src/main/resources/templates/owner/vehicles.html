@@ -35,6 +35,13 @@
             <a href="/owner/vehicles/add" class="btn btn-primary">Add Vehicle</a>
         </div>
 
+        <div th:if="${param.updated}" class="alert alert-success" style="margin-bottom: 20px;">
+            Vehicle details updated successfully!
+        </div>
+        <div th:if="${param.archived}" class="alert alert-success" style="margin-bottom: 20px;">
+            Vehicle has been archived successfully.
+        </div>
+
         <div th:if="${vehicles.isEmpty()}" class="empty-state">
             <img th:src="@{/images/empty-vehicles.png}" alt="No vehicles found">
             <h3>No vehicles registered</h3>
@@ -60,6 +67,12 @@
                         <span class="detail-label">Status</span>
                         <span class="detail-value" style="color: var(--success-green-text);">Active</span>
                     </div>
+                </div>
+                <div style="display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--border-color, #e5e7eb);">
+                    <a th:href="@{/owner/vehicles/{id}/edit(id=${v.id})}" class="btn btn-secondary" style="padding: 6px 12px; font-size: 0.85rem;">Edit</a>
+                    <form th:action="@{/owner/vehicles/{id}/archive(id=${v.id})}" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to archive this vehicle?');">
+                        <button type="submit" class="btn" style="padding: 6px 12px; font-size: 0.85rem; background: #fee2e2; color: #dc2626; border: 1px solid #fecaca; cursor: pointer;">Archive</button>
+                    </form>
                 </div>
             </div>
         </div>

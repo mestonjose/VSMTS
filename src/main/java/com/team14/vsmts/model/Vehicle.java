@@ -24,6 +24,9 @@ public class Vehicle {
 
     private String color;
 
+    // VSMTS-6: Archive flag — archived vehicles are hidden from active views
+    private boolean archived = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id", nullable = false)
     private User owner;
@@ -47,6 +50,9 @@ public class Vehicle {
 
     public String getColor() { return color; }
     public void setColor(String color) { this.color = color; }
+
+    public boolean isArchived() { return archived; }
+    public void setArchived(boolean archived) { this.archived = archived; }
 
     public User getOwner() { return owner; }
     public void setOwner(User owner) { this.owner = owner; }
