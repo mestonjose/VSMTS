@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Reminders - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            <a href="/owner/reminders" class="active">Reminders</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="dashboard-container">
+        <div class="section-header" style="margin-top: 0;">
+            <div>
+                <h1 style="font-size: 1.75rem;">Maintenance Reminders</h1>
+                <p style="color: var(--text-secondary); margin-top: 4px;">Stay ahead of routine service, oil changes, and inspections.</p>
+            </div>
+            <a href="/owner/reminders/add" class="btn btn-primary" th:if="${!vehicles.isEmpty()}">+ New Reminder</a>
+        </div>
+
+        <div th:if="${param.added}" class="alert alert-success">
+            Maintenance reminder set successfully.
+        </div>
+        <div th:if="${param.completed}" class="alert alert-success">
+            Maintenance reminder marked as completed!
+        </div>
+        <div th:if="${param.snoozed}" class="alert alert-success">
+            Reminder snoozed for 7 days.
+        </div>
+
+        <div th:if="${vehicles.isEmpty()}" class="empty-state">
+            <img th:src="@{/images/empty-vehicles.png}" alt="No vehicles found">
+            <h3>No vehicles available</h3>
+            <p>Please register a vehicle first before setting up maintenance reminders.</p>
+            <a href="/owner/vehicles/add" class="btn btn-primary">Add Vehicle</a>
+        </div>
+
+        <div th:if="${!vehicles.isEmpty() && reminders.isEmpty()}" class="empty-state">
+            <h3>All caught up!</h3>
+            <p>You have no active maintenance reminders. Set one up to get notified before your next service is due.</p>
+            <a href="/owner/reminders/add" class="btn btn-primary">Set Reminder</a>
+        </div>
+
+        <div class="table-wrapper" th:if="${!reminders.isEmpty()}">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Title</th>
+                        <th>Vehicle</th>
+                        <th>Due Date</th>
+                        <th>Details</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${reminders}">
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${r.urgent ? 'badge-blue' : 'badge-green'}"
+                                  th:text="${r.urgent ? 'Due Soon' : 'Upcoming'}">Upcoming</span>
+                        </td>
+                        <td style="font-weight: 600;" th:text="${r.title}">Oil Change</td>
+                        <td th:text="${r.vehicle.make + ' ' + r.vehicle.model + ' (' + r.vehicle.licensePlate + ')'}">Toyota</td>
+                        <td th:text="${r.dueDate}">2026-10-20</td>
+                        <td th:text="${r.description != null && !r.description.isEmpty() ? r.description : '-'}">-</td>
+                        <td>
+                            <div style="display: flex; gap: 8px;">
+                                <form th:action="@{/owner/reminders/{id}/complete(id=${r.id})}" method="post" style="display:inline;">
+                                    <button type="submit" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">✓ Done</button>
+                                </form>
+                                <form th:action="@{/owner/reminders/{id}/snooze(id=${r.id})}" method="post" style="display:inline;">
+                                    <input type="hidden" name="days" value="7" />
+                                    <button type="submit" class="btn btn-sm btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">⏰ Snooze</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</body>
+</html>
