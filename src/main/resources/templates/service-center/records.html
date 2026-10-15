@@ -52,6 +52,7 @@
                         <th>Description</th>
                         <th>Cost</th>
                         <th>Status</th>
+                        <th>Invoice</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,6 +67,19 @@
                             <span class="badge"
                                   th:classappend="${record.status == 'COMPLETED' ? 'badge-green' : (record.status == 'PENDING' ? 'badge-gray' : 'badge-blue')}"
                                   th:text="${record.status}">-</span>
+                        </td>
+                        <td>
+                            <!-- Download if invoice exists, else Upload link -->
+                            <a th:if="${record.invoiceFileName != null}"
+                               th:href="@{/invoice/download/{id}(id=${record.id})}"
+                               class="btn btn-sm btn-primary" style="font-size:0.78rem; padding: 4px 10px;">
+                               ⬇ Download
+                            </a>
+                            <a th:unless="${record.invoiceFileName != null}"
+                               th:href="@{/service-center/invoice/upload/{id}(id=${record.id})}"
+                               class="btn btn-sm" style="font-size:0.78rem; padding: 4px 10px; background:#f1f5f9; color:#475569;">
+                               ⬆ Upload
+                            </a>
                         </td>
                     </tr>
                 </tbody>

@@ -48,4 +48,13 @@ public class ServiceRecordService {
     public List<ServiceRecord> getRecordsByVehiclesSortedByDate(List<Vehicle> vehicles) {
         return serviceRecordRepository.findByVehicleInOrderByServiceDateDesc(vehicles);
     }
+
+    // VSMTS-11: Find a record by id and save invoice file name
+    public ServiceRecord findById(Long id) {
+        return serviceRecordRepository.findById(id).orElse(null);
+    }
+
+    public ServiceRecord save(ServiceRecord record) {
+        return serviceRecordRepository.save(record);
+    }
 }

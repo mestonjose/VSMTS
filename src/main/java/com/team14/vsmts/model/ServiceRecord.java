@@ -24,6 +24,8 @@ public class ServiceRecord {
 
     private String status; // PENDING, IN_PROGRESS, COMPLETED
 
+    private String invoiceFileName; // VSMTS-11: stores uploaded invoice file name
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "vehicle_id", nullable = false)
     private Vehicle vehicle;
@@ -51,6 +53,9 @@ public class ServiceRecord {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getInvoiceFileName() { return invoiceFileName; }
+    public void setInvoiceFileName(String invoiceFileName) { this.invoiceFileName = invoiceFileName; }
 
     public Vehicle getVehicle() { return vehicle; }
     public void setVehicle(Vehicle vehicle) { this.vehicle = vehicle; }
