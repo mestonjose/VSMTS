@@ -12,7 +12,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.List;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 @Controller
 @RequestMapping("/owner")
@@ -77,5 +81,42 @@ public class OwnerController {
         model.addAttribute("records", records);
         model.addAttribute("vehicles", vehicles);
         return "owner/service-history";
+    }
+
+    // VSMTS-15: Export service records to CSV
+    @GetMapping("/service-history/export")
+    public void exportServiceHistory(Authentication auth, HttpServletResponse response) throws IOException {
+        User user = userService.findByEmail(auth.getName());
+        List<Vehicle> vehicles = vehicleService.getVehiclesByOwner(user);
+        List<ServiceRecord> records = serviceRecordService.getRecordsByVehicles(vehicles);
+
+        response.setContentType("text/csv");
+        response.setHeader("Content-Disposition", "attachment; filename=\"service-history.csv\"");
+
+        PrintWriter writer = response.getWriter();
+        writer.println("Date,Vehicle,Registration Number,Service Type,Service Center,Description,Cost,Status");
+
+        for (ServiceRecord r : records) {
+            String line = String.join(",",
+                    escapeCsv(r.getServiceDate() != null ? r.getServiceDate().toString() : ""),
+                    escapeCsv(r.getVehicle().getMake() + " " + r.getVehicle().getModel()),
+                    escapeCsv(r.getVehicle().getLicensePlate()),
+                    escapeCsv(r.getServiceType()),
+                    escapeCsv(r.getServiceCenter().getFullName()),
+                    escapeCsv(r.getDescription() != null ? r.getDescription() : ""),
+                    String.valueOf(r.getCost()),
+                    escapeCsv(r.getStatus() != null ? r.getStatus() : "")
+            );
+            writer.println(line);
+        }
+        writer.flush();
+    }
+
+    private String escapeCsv(String value) {
+        if (value == null) return "";
+        if (value.contains(",") || value.contains("\"") || value.contains("\n")) {
+            return "\"" + value.replace("\"", "\"\"") + "\"";
+        }
+        return value;
     }
 }
