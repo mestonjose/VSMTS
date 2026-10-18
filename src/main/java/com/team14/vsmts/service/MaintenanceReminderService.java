@@ -64,4 +64,19 @@ public class MaintenanceReminderService {
             reminderRepository.save(reminder);
         }
     }
+
+    // VSMTS-13: Snooze and complete reminders enhancements
+    public List<MaintenanceReminder> getCompletedReminders(User owner) {
+        return reminderRepository.findByOwnerAndCompletedTrueOrderByDueDateDesc(owner);
+    }
+
+    public void reopenReminder(Long id) {
+        MaintenanceReminder reminder = findById(id);
+        if (reminder != null) {
+            reminder.setCompleted(false);
+            reminder.setSnoozed(false);
+            reminder.setSnoozeUntil(null);
+            reminderRepository.save(reminder);
+        }
+    }
 }

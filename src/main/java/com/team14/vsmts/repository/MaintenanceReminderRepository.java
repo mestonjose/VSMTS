@@ -16,4 +16,5 @@ public interface MaintenanceReminderRepository extends JpaRepository<Maintenance
     List<MaintenanceReminder> findByOwnerAndCompletedFalseOrderByDueDateAsc(User owner);
     List<MaintenanceReminder> findByVehicle(Vehicle vehicle);
     List<MaintenanceReminder> findByOwnerAndCompletedFalseAndDueDateLessThanEqual(User owner, LocalDate date);
+    List<MaintenanceReminder> findByOwnerAndCompletedTrueOrderByDueDateDesc(User owner);
 }

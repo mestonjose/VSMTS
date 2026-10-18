@@ -87,14 +87,16 @@ public class OwnerController {
         return "owner/service-history";
     }
 
-    // VSMTS-12: Maintenance Reminders
+    // VSMTS-12 & VSMTS-13: Maintenance Reminders (Snooze & Complete)
     @GetMapping("/reminders")
     public String listReminders(Authentication auth, Model model) {
         User user = userService.findByEmail(auth.getName());
         List<MaintenanceReminder> activeReminders = reminderService.getActiveReminders(user);
+        List<MaintenanceReminder> completedReminders = reminderService.getCompletedReminders(user);
         List<Vehicle> vehicles = vehicleService.getVehiclesByOwner(user);
 
         model.addAttribute("reminders", activeReminders);
+        model.addAttribute("completedReminders", completedReminders);
         model.addAttribute("vehicles", vehicles);
         return "owner/reminders";
     }
@@ -136,6 +138,13 @@ public class OwnerController {
     public String snoozeReminder(@PathVariable Long id, @RequestParam(defaultValue = "7") int days) {
         reminderService.snoozeReminder(id, days);
         return "redirect:/owner/reminders?snoozed";
+    }
+
+    // VSMTS-13: Re-open completed reminder
+    @PostMapping("/reminders/{id}/reopen")
+    public String reopenReminder(@PathVariable Long id) {
+        reminderService.reopenReminder(id);
+        return "redirect:/owner/reminders?reopened";
     }
 }
 

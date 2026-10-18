@@ -43,7 +43,10 @@
             Maintenance reminder marked as completed!
         </div>
         <div th:if="${param.snoozed}" class="alert alert-success">
-            Reminder snoozed for 7 days.
+            Reminder snoozed successfully.
+        </div>
+        <div th:if="${param.reopened}" class="alert alert-success">
+            Reminder re-opened and moved back to active list.
         </div>
 
         <div th:if="${vehicles.isEmpty()}" class="empty-state">
@@ -60,6 +63,7 @@
         </div>
 
         <div class="table-wrapper" th:if="${!reminders.isEmpty()}">
+            <h3 style="margin-bottom: 16px; font-size: 1.1rem;">Active Reminders</h3>
             <table class="data-table">
                 <thead>
                     <tr>
@@ -77,21 +81,62 @@
                             <span class="badge"
                                   th:classappend="${r.urgent ? 'badge-blue' : 'badge-green'}"
                                   th:text="${r.urgent ? 'Due Soon' : 'Upcoming'}">Upcoming</span>
+                            <div th:if="${r.snoozed && r.snoozeUntil != null}" style="font-size: 0.75rem; color: var(--text-secondary); margin-top: 4px;">
+                                ⏰ Snoozed until <span th:text="${r.snoozeUntil}">date</span>
+                            </div>
                         </td>
                         <td style="font-weight: 600;" th:text="${r.title}">Oil Change</td>
                         <td th:text="${r.vehicle.make + ' ' + r.vehicle.model + ' (' + r.vehicle.licensePlate + ')'}">Toyota</td>
                         <td th:text="${r.dueDate}">2026-10-20</td>
                         <td th:text="${r.description != null && !r.description.isEmpty() ? r.description : '-'}">-</td>
                         <td>
-                            <div style="display: flex; gap: 8px;">
+                            <div style="display: flex; gap: 8px; align-items: center;">
                                 <form th:action="@{/owner/reminders/{id}/complete(id=${r.id})}" method="post" style="display:inline;">
                                     <button type="submit" class="btn btn-sm btn-primary" style="padding: 4px 10px; font-size: 0.8rem;">✓ Done</button>
                                 </form>
-                                <form th:action="@{/owner/reminders/{id}/snooze(id=${r.id})}" method="post" style="display:inline;">
-                                    <input type="hidden" name="days" value="7" />
-                                    <button type="submit" class="btn btn-sm btn-secondary" style="padding: 4px 10px; font-size: 0.8rem;">⏰ Snooze</button>
+                                <form th:action="@{/owner/reminders/{id}/snooze(id=${r.id})}" method="post" style="display:inline-flex; align-items: center; gap: 4px;">
+                                    <select name="days" class="form-control" style="padding: 3px 6px; font-size: 0.75rem; width: auto; height: 28px;">
+                                        <option value="3">3d</option>
+                                        <option value="7" selected>7d</option>
+                                        <option value="14">14d</option>
+                                        <option value="30">30d</option>
+                                    </select>
+                                    <button type="submit" class="btn btn-sm btn-secondary" style="padding: 4px 8px; font-size: 0.8rem; height: 28px;">⏰ Snooze</button>
                                 </form>
                             </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- VSMTS-13: Completed Reminders History -->
+        <div class="table-wrapper" th:if="${completedReminders != null && !completedReminders.isEmpty()}" style="margin-top: 32px;">
+            <h3 style="margin-bottom: 16px; font-size: 1.1rem; color: var(--text-secondary);">Completed Reminders History</h3>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Status</th>
+                        <th>Title</th>
+                        <th>Vehicle</th>
+                        <th>Original Due Date</th>
+                        <th>Details</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="cr : ${completedReminders}">
+                        <td>
+                            <span class="badge badge-gray">Completed</span>
+                        </td>
+                        <td style="font-weight: 500; text-decoration: line-through; color: var(--text-secondary);" th:text="${cr.title}">Title</td>
+                        <td th:text="${cr.vehicle.make + ' ' + cr.vehicle.model + ' (' + cr.vehicle.licensePlate + ')'}">Vehicle</td>
+                        <td th:text="${cr.dueDate}">Date</td>
+                        <td th:text="${cr.description != null && !cr.description.isEmpty() ? cr.description : '-'}">-</td>
+                        <td>
+                            <form th:action="@{/owner/reminders/{id}/reopen(id=${cr.id})}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-sm btn-secondary" style="padding: 3px 8px; font-size: 0.75rem;">↩ Reopen</button>
+                            </form>
                         </td>
                     </tr>
                 </tbody>
