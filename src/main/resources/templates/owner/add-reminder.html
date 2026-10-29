@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Set Maintenance Reminder - DriveLedger</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">DriveLedger</a>
+        <div class="navbar-links">
+            <a href="/owner/dashboard">Dashboard</a>
+            <a href="/owner/vehicles">My Vehicles</a>
+            <a href="/owner/service-history">Service History</a>
+            <a href="/owner/reminders" class="active">Reminders</a>
+            
+            <div class="profile-menu">
+                <button class="profile-menu-btn">Profile ▼</button>
+                <div class="profile-dropdown">
+                    <a href="/profile">Account Settings</a>
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit">Sign Out</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <div class="form-page-container">
+        <div class="form-page-header">
+            <h2>Set Maintenance Reminder</h2>
+            <p style="color: var(--text-secondary); margin-top: 4px;">Schedule upcoming service or routine vehicle maintenance.</p>
+        </div>
+
+        <div class="form-card">
+            <form th:action="@{/owner/reminders/add}" method="post">
+                <div class="form-group">
+                    <label for="vehicleId">Select Vehicle</label>
+                    <select id="vehicleId" name="vehicleId" class="form-control" required>
+                        <option value="" disabled selected>Choose a vehicle</option>
+                        <option th:each="v : ${vehicles}"
+                                th:value="${v.id}"
+                                th:text="${v.make + ' ' + v.model + ' (' + v.licensePlate + ')'}">Toyota Corolla</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="title">Reminder Title</label>
+                    <input type="text" id="title" name="title" class="form-control" placeholder="e.g. Engine Oil & Filter Change" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="dueDate">Due Date</label>
+                    <input type="date" id="dueDate" name="dueDate" class="form-control" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Notes / Description (Optional)</label>
+                    <textarea id="description" name="description" class="form-control" rows="3" placeholder="e.g. Recommended every 10,000 km or 6 months"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 12px; margin-top: 24px;">
+                    <button type="submit" class="btn btn-primary" style="flex: 1;">Save Reminder</button>
+                    <a href="/owner/reminders" class="btn btn-secondary" style="flex: 1; text-align: center;">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
