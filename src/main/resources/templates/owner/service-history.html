@@ -33,6 +33,46 @@
                 <p style="color: var(--text-secondary); margin-top: 4px;">Complete maintenance records for all your vehicles.</p>
             </div>
         </div>
+        <!-- VSMTS-10: Filter form -->
+        <div class="form-card" style="margin-bottom: 24px; padding: 16px 20px;">
+            <form th:action="@{/owner/service-history}" method="get" style="display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end;">
+                <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 140px;">
+                    <label for="startDate" style="font-size: 0.8rem; margin-bottom: 4px;">From Date</label>
+                    <input type="date" id="startDate" name="startDate" th:value="${startDate}" class="form-control" style="padding: 6px 10px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 140px;">
+                    <label for="endDate" style="font-size: 0.8rem; margin-bottom: 4px;">To Date</label>
+                    <input type="date" id="endDate" name="endDate" th:value="${endDate}" class="form-control" style="padding: 6px 10px;">
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 140px;">
+                    <label for="serviceType" style="font-size: 0.8rem; margin-bottom: 4px;">Service Type</label>
+                    <select id="serviceType" name="serviceType" class="form-control" style="padding: 6px 10px;">
+                        <option value="">All Types</option>
+                        <option value="Oil Change" th:selected="${serviceType == 'Oil Change'}">Oil Change</option>
+                        <option value="Tire Rotation" th:selected="${serviceType == 'Tire Rotation'}">Tire Rotation</option>
+                        <option value="Brake Service" th:selected="${serviceType == 'Brake Service'}">Brake Service</option>
+                        <option value="Engine Repair" th:selected="${serviceType == 'Engine Repair'}">Engine Repair</option>
+                        <option value="General Service" th:selected="${serviceType == 'General Service'}">General Service</option>
+                        <option value="AC Service" th:selected="${serviceType == 'AC Service'}">AC Service</option>
+                        <option value="Battery Replacement" th:selected="${serviceType == 'Battery Replacement'}">Battery Replacement</option>
+                        <option value="Other" th:selected="${serviceType == 'Other'}">Other</option>
+                    </select>
+                </div>
+                <div class="form-group" style="margin-bottom: 0; flex: 1; min-width: 140px;">
+                    <label for="status" style="font-size: 0.8rem; margin-bottom: 4px;">Status</label>
+                    <select id="status" name="status" class="form-control" style="padding: 6px 10px;">
+                        <option value="">All Statuses</option>
+                        <option value="PENDING" th:selected="${status == 'PENDING'}">Pending</option>
+                        <option value="IN_PROGRESS" th:selected="${status == 'IN_PROGRESS'}">In Progress</option>
+                        <option value="COMPLETED" th:selected="${status == 'COMPLETED'}">Completed</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 8px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 7px 16px; font-size: 0.85rem;">Filter</button>
+                    <a href="/owner/service-history" class="btn btn-secondary" style="padding: 7px 16px; font-size: 0.85rem;">Clear</a>
+                </div>
+            </form>
+        </div>
 
         <div class="table-wrapper">
             <div th:if="${records.isEmpty()}" class="empty-state" style="border: none;">

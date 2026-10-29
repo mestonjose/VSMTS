@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Controller
@@ -69,13 +70,27 @@ public class OwnerController {
         return "owner/vehicles";
     }
 
+    // VSMTS-10: Filter service records by date range, service type, and status
     @GetMapping("/service-history")
-    public String serviceHistory(Authentication auth, Model model) {
+    public String serviceHistory(@RequestParam(required = false) String startDate,
+                                  @RequestParam(required = false) String endDate,
+                                  @RequestParam(required = false) String serviceType,
+                                  @RequestParam(required = false) String status,
+                                  Authentication auth, Model model) {
         User user = userService.findByEmail(auth.getName());
         List<Vehicle> vehicles = vehicleService.getVehiclesByOwner(user);
-        List<ServiceRecord> records = serviceRecordService.getRecordsByVehicles(vehicles);
+
+        LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
+        LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
+
+        List<ServiceRecord> records = serviceRecordService.filterRecords(vehicles, start, end, serviceType, status);
+
         model.addAttribute("records", records);
         model.addAttribute("vehicles", vehicles);
+        model.addAttribute("startDate", startDate);
+        model.addAttribute("endDate", endDate);
+        model.addAttribute("serviceType", serviceType);
+        model.addAttribute("status", status);
         return "owner/service-history";
     }
 }
