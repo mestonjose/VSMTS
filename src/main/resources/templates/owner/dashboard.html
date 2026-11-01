@@ -13,6 +13,7 @@
             <a href="/owner/dashboard" class="active">Dashboard</a>
             <a href="/owner/vehicles">My Vehicles</a>
             <a href="/owner/service-history">Service History</a>
+            <a href="/owner/reminders">Reminders</a>
             
             <div class="profile-menu">
                 <button class="profile-menu-btn">Profile ▼</button>
@@ -30,6 +31,14 @@
         <div class="dashboard-header">
             <h1 th:text="'Good morning, ' + ${user.fullName}">Good morning</h1>
             <p>Track your vehicles, service history, and upcoming maintenance.</p>
+        </div>
+
+        <!-- VSMTS-12: Maintenance Notification Banner -->
+        <div th:if="${reminderCount > 0}" class="alert" style="background-color: #eff6ff; border: 1px solid #bfdbfe; color: #1e40af; display: flex; justify-content: space-between; align-items: center; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px;">
+            <div>
+                <strong>🔔 Maintenance Due Alert:</strong> You have <span th:text="${reminderCount}">1</span> vehicle service reminder(s) due soon!
+            </div>
+            <a href="/owner/reminders" class="btn btn-sm btn-primary" style="padding: 4px 12px; font-size: 0.85rem;">View Reminders</a>
         </div>
 
         <div th:if="${param.vehicleAdded}" class="alert alert-success">

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ServiceRecordService {
@@ -47,5 +48,18 @@ public class ServiceRecordService {
 
     public List<ServiceRecord> getRecordsByVehiclesSortedByDate(List<Vehicle> vehicles) {
         return serviceRecordRepository.findByVehicleInOrderByServiceDateDesc(vehicles);
+    }
+
+    // VSMTS-10: Filter service records by date range, service type, and status
+    public List<ServiceRecord> filterRecords(List<Vehicle> vehicles, LocalDate startDate, LocalDate endDate,
+                                              String serviceType, String status) {
+        List<ServiceRecord> records = serviceRecordRepository.findByVehicleInOrderByServiceDateDesc(vehicles);
+
+        return records.stream()
+                .filter(r -> startDate == null || !r.getServiceDate().isBefore(startDate))
+                .filter(r -> endDate == null || !r.getServiceDate().isAfter(endDate))
+                .filter(r -> serviceType == null || serviceType.isEmpty() || serviceType.equalsIgnoreCase(r.getServiceType()))
+                .filter(r -> status == null || status.isEmpty() || status.equalsIgnoreCase(r.getStatus()))
+                .collect(Collectors.toList());
     }
 }

@@ -69,6 +69,6 @@ public class OwnerControllerCoverageTest {
     public void testServiceHistory() {
         when(auth.getName()).thenReturn("t@t.com");
         when(userService.findByEmail(anyString())).thenReturn(new User());
-        assertEquals("owner/service-history", controller.serviceHistory(auth, model));
+        assertEquals("owner/service-history", controller.serviceHistory(null, null, null, null, auth, model));
     }
 }

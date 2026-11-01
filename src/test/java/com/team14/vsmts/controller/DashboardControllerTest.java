@@ -1,6 +1,7 @@
 package com.team14.vsmts.controller;
 
 import com.team14.vsmts.model.User;
+import com.team14.vsmts.service.MaintenanceReminderService;
 import com.team14.vsmts.service.UserService;
 import com.team14.vsmts.service.VehicleService;
 import com.team14.vsmts.service.ServiceRecordService;
@@ -33,6 +34,9 @@ public class DashboardControllerTest {
 
     @Mock
     private ServiceRecordService serviceRecordService;
+
+    @Mock
+    private MaintenanceReminderService reminderService;
 
     @Mock
     private VehicleRepository vehicleRepository;
@@ -96,6 +100,7 @@ public class DashboardControllerTest {
             when(userService.findByEmail("owner@test.com")).thenReturn(testUser);
             when(vehicleService.getVehiclesByOwner(testUser)).thenReturn(Collections.emptyList());
             when(serviceRecordService.getRecordsByVehicles(anyList())).thenReturn(Collections.emptyList());
+            when(reminderService.getDueNotifications(testUser)).thenReturn(Collections.emptyList());
 
             String viewName = ownerController.dashboard(authentication, model);
 
